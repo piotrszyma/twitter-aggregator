@@ -11,4 +11,4 @@ cache_tweets_list = true
 max_results = 100
 # Number of most common items shown in program output.
 most_common_count = 10
-debug = true
+debug = false

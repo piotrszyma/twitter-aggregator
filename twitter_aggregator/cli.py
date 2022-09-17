@@ -1,6 +1,7 @@
 import collections
 import dataclasses
 import logging
+import sys
 from typing import Type
 
 import requests_cache
@@ -38,8 +39,10 @@ class Cli:
         session_factory: Type[
             requests_cache.CachedSession
         ] = requests_cache.CachedSession,
+        output=sys.stdout,
     ):
         self._session_factory = session_factory
+        self._output = output
 
     def run(self, config: CliConfig) -> None:
         twitter_config = config.twitter
@@ -86,7 +89,7 @@ class Cli:
             tool_config.most_common_count
         )
 
-        print(f"{hashtags_count=}")
-        print(f"{mentions_count=}")
-        print(f"{most_common_hashtags=}")
-        print(f"{most_common_mentions=}")
+        self._output.write(f"{hashtags_count=}\n")
+        self._output.write(f"{mentions_count=}\n")
+        self._output.write(f"{most_common_hashtags=}\n")
+        self._output.write(f"{most_common_mentions=}\n")
