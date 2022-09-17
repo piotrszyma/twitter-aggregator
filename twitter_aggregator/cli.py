@@ -1,7 +1,6 @@
 import collections
 import dataclasses
 from typing import Type
-from urllib import request
 
 import requests_cache
 
@@ -11,8 +10,6 @@ from twitter_aggregator.operators import get_hashtags, get_mentions
 
 @dataclasses.dataclass(frozen=True)
 class TwitterConfig:
-    api_key: str
-    api_key_secret: str
     bearer_token: str
     base_path: str
 
