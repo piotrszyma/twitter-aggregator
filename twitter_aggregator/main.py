@@ -1,8 +1,12 @@
+import collections
 import dataclasses
-import toml
 
+import toml
 from dacite.core import from_dict
+
 from twitter_aggregator.api_client import TwitterClient
+from twitter_aggregator.operators import hashtags, mentions
+from twitter_aggregator.argparser import parse_args
 
 
 @dataclasses.dataclass(frozen=True)
@@ -13,27 +17,46 @@ class TwitterConfig:
     base_path: str
 
 
-@dataclasses.dataclass
-class Config:
+@dataclasses.dataclass(frozen=True)
+class ToolConfig:
+    queried_profile_name: str
+    cache_tweets_list: bool
+
+
+@dataclasses.dataclass(frozen=True)
+class CliConfig:
     twitter: TwitterConfig
+    tool: ToolConfig
 
 
-if __name__ == "__main__":
-    raw_config = toml.load("config.toml")
+def run_cli(config: CliConfig) -> None:
+    twitter_config = config.twitter
+    tool_config = config.tool
 
-    app_config = from_dict(data_class=Config, data=raw_config)
-    config = app_config.twitter
+    client = TwitterClient(
+        base_path=twitter_config.base_path,
+        bearer_token=twitter_config.bearer_token,
+        cache_tweets_list=tool_config.cache_tweets_list,
+    )
 
-    client = TwitterClient(base_path=config.base_path, bearer_token=config.bearer_token)
-
-    users_data = client.get_users(["Google"])
-    assert len(users_data) == 1
+    users_data = client.get_users([tool_config.queried_profile_name])
+    assert (
+        len(users_data) == 1
+    ), f"Profile with name {tool_config.queried_profile_name} does not exist."
 
     user_tweets = client.get_tweets(user_id=users_data[0].id)
 
-    first_tweet_id = user_tweets[0].id
+    tweets = tuple(client.get_tweet(id=t.id) for t in user_tweets)
 
-    first_tweet = client.get_tweet(id=first_tweet_id)
+    hashtags_counter = collections.Counter(hashtags(tweets))
+    mentions_counter = collections.Counter(mentions(tweets))
 
-    breakpoint()
-    breakpoint()
+    print(f"{hashtags_counter.most_common(5)=}")
+    print(f"{mentions_counter.most_common(5)=}")
+
+
+if __name__ == "__main__":
+    cli_args = parse_args()
+    raw_config = toml.load(cli_args.config_path)
+    config = from_dict(data_class=CliConfig, data=raw_config)
+    run_cli(config)

@@ -162,3 +162,4 @@ cython_debug/
 # Ignore config.
 config.toml
 http_cache.sqlite
+.pdb-pyhist

@@ -1,0 +1,12 @@
+[twitter]
+api_key = ""
+api_key_secret = ""
+bearer_token = ""
+base_path = "https://api.twitter.com"
+
+[tool]
+# Display name of the Twitter's profile to check.
+queried_profile_name = "Google"
+# Tweets list does not change that often.
+cache_tweets_list = true
+
