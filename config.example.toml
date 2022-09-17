@@ -7,7 +7,8 @@ base_path = "https://api.twitter.com"
 queried_profile_name = "Google"
 # Tweets list does not change that often.
 cache_tweets_list = true
+# Max number of tweets queried for profile.
+max_results = 100
 # Number of most common items shown in program output.
 most_common_count = 10
-# Configure log level.
-log_level = "debug"
+debug = true
