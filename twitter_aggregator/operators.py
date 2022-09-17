@@ -9,7 +9,7 @@ from typing import Iterable
 from api_client import TweetDetailsData
 
 
-def hashtags(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:
+def get_hashtags(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:
     """Yields hashtags from iterable of tweets."""
     for tweet in tweets:
         if tweet.entities is None:
@@ -21,7 +21,7 @@ def hashtags(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:
         yield from (h.tag for h in tweet.entities.hashtags)
 
 
-def mentions(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:
+def get_mentions(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:
     """Yields mentioned usernames from iterable of tweets."""
     for tweet in tweets:
         if tweet.entities is None:

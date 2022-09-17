@@ -1,4 +1,5 @@
 import http
+from typing import Type
 
 import requests
 import requests_cache
@@ -13,8 +14,8 @@ class TwitterClient:
         *,
         base_path: str,
         bearer_token: str,
+        session_factory: Type[requests_cache.CachedSession],
         cache_tweets_list=False,
-        session_factory=requests_cache.CachedSession,
     ):
         self._base_path = base_path
         self._bearer_token = bearer_token
