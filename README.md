@@ -1,4 +1,6 @@
-# How to install
+# twitter aggregator
+
+## How to run - step by step
 
 1. make sure you have [poetry](https://python-poetry.org/) and proper version of `python3` installed (specified in `pyproject.toml`)
 2. install dependencies via `poetry install`
