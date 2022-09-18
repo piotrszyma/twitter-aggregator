@@ -27,10 +27,9 @@ class FakeSession(requests.Session):
             ).read_text()
             data = json.loads(raw_data)
             response.json.return_value = data
-        else:
+        elif "/2/tweets/" in url:
             match = re.compile(r"/2/tweets/(\d+)").search(url)
-            if match is None:
-                raise ValueError("Unexpected url: %s" % url)
+            assert match is not None
 
             id = match[1]
             raw_data = pathlib.Path(
@@ -38,6 +37,8 @@ class FakeSession(requests.Session):
             ).read_text()
             data = json.loads(raw_data)
             response.json.return_value = data
+        else:
+            raise ValueError("Unexpected url: %s" % url)
 
         return response
 
