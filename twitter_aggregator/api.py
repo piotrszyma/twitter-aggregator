@@ -1,9 +1,8 @@
+import dataclasses
 import http
 import logging
-from typing import Type
 
 import requests
-import requests_cache
 from dacite.core import from_dict
 
 from twitter_aggregator.models import TweetData, TweetDetailsData, UserData
@@ -11,21 +10,21 @@ from twitter_aggregator.models import TweetData, TweetDetailsData, UserData
 logger = logging.getLogger(__name__)
 
 
-class TwitterClient:
+@dataclasses.dataclass(frozen=True)
+class ApiConfig:
+    base_path: str
+    bearer_token: str
+
+
+class TwitterApi:
     def __init__(
         self,
         *,
         base_path: str,
-        bearer_token: str,
-        session_factory: Type[requests_cache.CachedSession],
-        cache_tweets_list=False,
+        session: requests.Session,
     ):
         self._base_path = base_path
-        self._bearer_token = bearer_token
-        self._session_with_cache = session_factory()
-        self._session_with_cache.headers["Authorization"] = f"Bearer {bearer_token}"
-        self._session_with_cache.headers["UserAgent"] = "test-client"
-        self._cache_tweets_list = cache_tweets_list
+        self._session = session
 
     def _assert_success(self, response: requests.Response) -> None:
         assert response.status_code == http.HTTPStatus.OK, (
@@ -34,16 +33,9 @@ class TwitterClient:
             f"{response.url=}"
         )
 
-    def _request(self, url, *, cache_disabled=False) -> requests.Response:
-
-        if cache_disabled:
-            logger.debug("Requesting %s with cache disabled", url)
-            with self._session_with_cache.cache_disabled():
-                response = self._session_with_cache.get(url)
-        else:
-            logger.debug("Requesting %s with cache enabled", url)
-            response = self._session_with_cache.get(url)
-
+    def _request(self, url) -> requests.Response:
+        logger.debug("Requesting %s", url)
+        response = self._session.get(url)
         logger.debug("Got response with status %s", response.status_code)
         return response
 
@@ -63,7 +55,7 @@ class TwitterClient:
             "tweet.fields=id"  # Fetch only IDs.
         )
 
-        response = self._request(url, cache_disabled=not self._cache_tweets_list)
+        response = self._request(url)
 
         self._assert_success(response)
         response_json = response.json().get("data")

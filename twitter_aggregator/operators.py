@@ -6,7 +6,7 @@ further statistics.
 """
 from typing import Iterable
 
-from api_client import TweetDetailsData
+from twitter_aggregator.models import TweetDetailsData
 
 
 def get_hashtags(tweets: Iterable[TweetDetailsData]) -> Iterable[str]:

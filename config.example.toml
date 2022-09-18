@@ -1,8 +1,8 @@
-[twitter]
+[api]
 bearer_token = ""
 base_path = "https://api.twitter.com"
 
-[tool]
+[cli]
 # Display name of the Twitter's profile to check.
 queried_profile_name = "Google"
 # Tweets list does not change that often.
