@@ -1,6 +1,5 @@
 import dataclasses
 import logging
-import re
 
 import requests_cache
 import toml
@@ -10,6 +9,7 @@ from twitter_aggregator.api import ApiConfig, TwitterApi
 from twitter_aggregator.argparser import parse_args
 from twitter_aggregator.cli import Cli, CliConfig
 from twitter_aggregator.logger import configure_logger
+from twitter_aggregator.cache import should_cache_url
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +20,19 @@ class Config:
     cli: CliConfig
 
 
-if __name__ == "__main__":
-    cli_args = parse_args()
-    raw_config = toml.load(cli_args.config_path)
-    config = from_dict(data_class=Config, data=raw_config)
+def cache_filter_fn(response: requests_cache.AnyResponse) -> bool:
+    should_cache = should_cache_url(response.url)
 
-    configure_logger(config.cli.debug)
+    if should_cache:
+        logger.debug("Should cache response.url=%s", response.url)
+    else:
+        logger.debug("Should not cache response.url=%s", response.url)
 
-    RE_USER_TWEETS_URL = re.compile(r"/2\/users\/\d+\/tweets/s")
+    return should_cache
 
-    def cache_controller(response: requests_cache.AnyResponse) -> bool:
-        return not bool(RE_USER_TWEETS_URL.search(response.url))
 
-    session = requests_cache.CachedSession(filter_fn=cache_controller)
+def configure_cli(config: Config) -> Cli:
+    session = requests_cache.CachedSession(filter_fn=cache_filter_fn)
     session.headers["Authorization"] = f"Bearer {config.api.bearer_token}"
 
     api = TwitterApi(
@@ -40,4 +40,15 @@ if __name__ == "__main__":
         session=session,
     )
 
-    Cli(config.cli, api).run()
+    return Cli(config.cli, api)
+
+
+if __name__ == "__main__":
+    cli_args = parse_args()
+    logger.debug("running cli from config path=%s", cli_args.config_path)
+    raw_config = toml.load(cli_args.config_path)
+    config = from_dict(data_class=Config, data=raw_config)
+
+    configure_logger(config.cli.debug)
+    cli = configure_cli(config)
+    cli.run()

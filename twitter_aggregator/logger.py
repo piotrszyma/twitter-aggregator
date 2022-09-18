@@ -2,7 +2,7 @@ import logging
 
 
 def configure_logger(debug: bool) -> logging.Logger:
-    logger = logging.getLogger("twitter_aggregator")
+    logger = logging.getLogger()
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
