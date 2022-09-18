@@ -1,8 +1,11 @@
 import dataclasses
 import logging
+import sys
+from typing import Optional
 
 import requests_cache
 import toml
+from requests import Session
 from dacite.core import from_dict
 
 from twitter_aggregator.api import ApiConfig, TwitterApi
@@ -20,7 +23,7 @@ class Config:
     cli: CliConfig
 
 
-def cache_filter_fn(response: requests_cache.AnyResponse) -> bool:
+def _cache_filter_fn(response: requests_cache.AnyResponse) -> bool:
     should_cache = should_cache_url(response.url)
 
     if should_cache:
@@ -31,16 +34,24 @@ def cache_filter_fn(response: requests_cache.AnyResponse) -> bool:
     return should_cache
 
 
-def configure_cli(config: Config) -> Cli:
-    session = requests_cache.CachedSession(filter_fn=cache_filter_fn)
+def _configure_session() -> Session:
+    session = requests_cache.CachedSession(filter_fn=_cache_filter_fn)
     session.headers["Authorization"] = f"Bearer {config.api.bearer_token}"
+    return session
 
-    api = TwitterApi(
+
+def configure_cli(
+    config: Config,
+    output=sys.stdout,
+    session: Optional[Session] = None,
+    api: Optional[TwitterApi] = None,
+) -> Cli:
+    api = api or TwitterApi(
         base_path=config.api.base_path,
-        session=session,
+        session=session or _configure_session(),
     )
 
-    return Cli(config.cli, api)
+    return Cli(config.cli, api, output=output)
 
 
 if __name__ == "__main__":

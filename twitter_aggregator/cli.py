@@ -1,7 +1,7 @@
 import collections
 import dataclasses
 import logging
-import sys
+from typing import TextIO
 
 from twitter_aggregator.api import TwitterApi
 from twitter_aggregator.operators import get_hashtags, get_mentions
@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 class CliConfig:
     debug: bool
     queried_profile_name: str
-    cache_tweets_list: bool
     most_common_count: int
     max_results: int
 
@@ -23,7 +22,7 @@ class Cli:
         self,
         config: CliConfig,
         twitter_api: TwitterApi,
-        output=sys.stdout,
+        output: TextIO,
     ):
         self._twitter_api = twitter_api
         self._config = config
