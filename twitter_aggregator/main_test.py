@@ -13,7 +13,7 @@ from twitter_aggregator.main import Config, configure_cli
 
 
 class FakeSession(requests.Session):
-    def get(self, url: str, **kwargs) -> requests.Response:
+    def get(self, url: str, **kwargs) -> requests.Response:  # type: ignore[override]
         response = mock.MagicMock(
             status_code=http.HTTPStatus.OK, spec=requests.Response
         )

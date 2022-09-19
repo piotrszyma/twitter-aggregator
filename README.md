@@ -18,7 +18,7 @@ poetry run pytest
 poetry run black . # Formatter.
 poetry run isort . # Imports sorting.
 poetry run flake8 # PEP-8 compliance.
-poetry run mypy  # Typechecker.
+poetry run mypy --show-error-codes . # Typechecker.
 ```
 
 ## Cache
