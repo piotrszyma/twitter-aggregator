@@ -1,14 +1,14 @@
 [api]
+# Fill with your Twitter API v2 bearer token.
 bearer_token = ""
 base_path = "https://api.twitter.com"
 
 [cli]
 # Display name of the Twitter's profile to check.
 queried_profile_name = "Google"
-# Tweets list does not change that often.
-cache_tweets_list = true
 # Max number of tweets queried for profile.
 max_results = 100
 # Number of most common items shown in program output.
 most_common_count = 10
+# Set to true to see detailed cli progress.
 debug = false
