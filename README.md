@@ -6,7 +6,7 @@
 2. install dependencies via `poetry install`
 3. copy sample config `cp config.example.toml config.toml`
 4. fill twitter API credentials in `config.toml` (bearer token)
-5. run cli `poetry run python3 twitter_aggregator/main.py --config-file ./config.toml`
+5. run cli `poetry run python3 twitter_aggregator/main.py --config-path ./config.toml`
 
 ## To run tests
 ```
