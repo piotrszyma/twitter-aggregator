@@ -5,14 +5,14 @@ from typing import Optional
 
 import requests_cache
 import toml
-from requests import Session
 from dacite.core import from_dict
+from requests import Session
 
 from twitter_aggregator.api import ApiConfig, TwitterApi
 from twitter_aggregator.argparser import parse_args
+from twitter_aggregator.cache import should_cache_url
 from twitter_aggregator.cli import Cli, CliConfig
 from twitter_aggregator.logger import configure_logger
-from twitter_aggregator.cache import should_cache_url
 
 logger = logging.getLogger(__name__)
 

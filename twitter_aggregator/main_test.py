@@ -1,13 +1,15 @@
 import http
+import io
 import json
 import pathlib
 import re
 from unittest import mock
-import io
+
 import requests
-from twitter_aggregator.main import configure_cli, Config
+
 from twitter_aggregator.api import ApiConfig
 from twitter_aggregator.cli import CliConfig
+from twitter_aggregator.main import Config, configure_cli
 
 
 class FakeSession(requests.Session):
@@ -45,7 +47,7 @@ class FakeSession(requests.Session):
 
 def test_calculates_stats():
     # Arrange.
-    output = io.StringIO()
+    buffer = io.StringIO()
     config = Config(
         api=ApiConfig(base_path="", bearer_token=""),
         cli=CliConfig(
@@ -55,15 +57,20 @@ def test_calculates_stats():
             max_results=100,
         ),
     )
-    cli = configure_cli(config, output, session=FakeSession())
+    cli = configure_cli(config, buffer, session=FakeSession())
 
     # Act.
     cli.run()
 
     # Assert.
-    expected_output = """hashtags_count=3
-mentions_count=55
-most_common_hashtags=[('GABI', 1), ('NextBillionUsers', 1), ('Pixel6', 1)]
-most_common_mentions=[('Google', 3), ('gmail', 2), ('SwaveDigest', 1), ('googlearts', 1), ('Lin_Manuel', 1), ('GoogleSmallBiz', 1), ('EricLeGrand52', 1), ('LeGrandCoffee', 1), ('akashsehwag', 1), ('iam_suraj_0718', 1)]
-"""
-    assert output.getvalue() == expected_output
+    output = buffer.getvalue()
+    assert "hashtags_count=3" in output
+    assert "mentions_count=55" in output
+    assert (
+        "most_common_hashtags=[('GABI', 1), ('NextBillionUsers', 1), ('Pixel6', 1)]"
+        in output
+    )
+    assert (
+        "most_common_mentions=[('Google', 3), ('gmail', 2), ('SwaveDigest', 1),"
+        in output
+    )
